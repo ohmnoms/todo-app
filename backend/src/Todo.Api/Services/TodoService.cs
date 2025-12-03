@@ -1,0 +1,65 @@
+using Todo.Api.Models.Contracts;
+using Todo.Api.Models.Domain;
+using Todo.Api.Persistence;
+
+namespace Todo.Api.Services;
+
+public interface ITodoService
+{
+    Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default);
+    Task<TodoItem> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<TodoItem> CreateAsync(CreateTodoRequest request, CancellationToken ct = default);
+    Task<TodoItem> UpdateAsync(UpdateTodoRequest request, CancellationToken ct = default);
+    Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
+}
+
+public class TodoService(ITodoRepository repository) : ITodoService
+{
+    private readonly ITodoRepository _repository = repository;
+
+    public async Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _repository.GetAllAsync(ct);
+    }
+
+    public async Task<TodoItem> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var todo = await _repository.GetByIdAsync(id, ct) ??
+            throw new KeyNotFoundException($"Todo item with id {id} not found.");
+        return todo;
+    }
+
+    public async Task<TodoItem> CreateAsync(CreateTodoRequest request, CancellationToken ct = default)
+    {
+        var todo = new TodoItem
+        {
+            Id = Guid.NewGuid(),
+            Title = request.Title,
+            IsCompleted = false,
+            CreatedDate = DateTimeOffset.Now
+        };
+
+        return await _repository.AddAsync(todo, ct);
+    }
+
+    public async Task<TodoItem> UpdateAsync(UpdateTodoRequest request, CancellationToken ct = default)
+    {
+        var todo = await _repository.GetByIdAsync(request.Id, ct) 
+            ?? throw new KeyNotFoundException($"Todo item with id {request.Id} not found.");
+            
+        todo.Title = request.Title;
+        todo.IsCompleted = request.IsCompleted;
+
+        await _repository.UpdateAsync(todo, ct);
+        return todo;
+    }
+
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
+    {
+        var todo = await _repository.GetByIdAsync(id, ct) 
+            ?? throw new KeyNotFoundException($"Todo item with id {id} not found.");
+
+        await _repository.DeleteAsync(todo, ct);
+        return true;
+    }
+}

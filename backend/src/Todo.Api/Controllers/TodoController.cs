@@ -1,44 +1,63 @@
 using Microsoft.AspNetCore.Mvc;
+using Todo.Api.Models.Contracts;
+using Todo.Api.Models.Domain;
+using Todo.Api.Services;
 
 namespace Todo.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TodoController : ControllerBase
+public class TodoController(ITodoService todoService) : ControllerBase
 {
-    // TODO: Add service DI (repository pattern)
-    public TodoController()
-    {
-    }
+    private readonly ITodoService _todoService = todoService;
 
     [HttpGet]
-    public IActionResult GetTodos()
+    [ProducesResponseType(typeof(IEnumerable<TodoItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetTodos()
     {
-        // TODO: Implement method to get all todos
-        return Ok();
+        var todos = await _todoService.GetAllAsync();
+        return Ok(todos);
+    }
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(TodoItem), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetTodoById(Guid id)
+    {
+        var todo = await _todoService.GetByIdAsync(id);
+        return Ok(todo);
     }
 
     [HttpPost]
-    [Route("create")]
-    public IActionResult CreateTodo([FromBody] CreateTodoRequest request)
+    [ProducesResponseType(typeof(TodoItem), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateTodo([FromBody] CreateTodoRequest request)
     {
-        // TODO: Implement method to create a new todo
-        return Ok();
+        var todo = await _todoService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, todo);
     }
 
     [HttpPut]
-    [Route("update")]
-    public IActionResult UpdateTodo([FromBody] UpdateTodoRequest request)
+    [ProducesResponseType(typeof(TodoItem), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateTodo([FromBody] UpdateTodoRequest request)
     {
-        // TODO: Implement method to update an existing todo
-        return Ok();
+        var todo = await _todoService.UpdateAsync(request);
+        return Ok(todo);
     }
 
-    [HttpDelete]
-    [Route("delete/{id}")]
-    public IActionResult DeleteTodo(Guid id)
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteTodo(Guid id)
     {
-        // TODO: Implement method to delete a todo by id
-        return Ok();
+        await _todoService.DeleteAsync(id);
+        return NoContent();
     }
 }
