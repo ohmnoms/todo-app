@@ -1,13 +1,30 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
-  const title = ref('');
-  const todos = ref<string[]>([]);
+import { ref } from 'vue';
+import TodoForm from './components/TodoForm.vue';
+import TodoList from './components/TodoList.vue';
+import type { TodoItem } from '@/models/todo-item';
 
-  function addTodo() {
-    if (!title.value.trim()) return;
-    todos.value.push(title.value.trim());
-    title.value = '';
-  }
+const todos = ref<TodoItem[]>([]);
+
+function addTodo(title: string) {
+  const newTodo: TodoItem = {
+    id: crypto.randomUUID(), // TEMP
+    title,
+    isCompleted: false,
+  };
+
+  todos.value = [...todos.value, newTodo];
+}
+
+function toggleTodoComplete(id: string) {
+  todos.value = todos.value.map((t) =>
+    t.id === id ? { ...t, isCompleted: !t.isCompleted } : t,
+  );
+}
+
+function deleteTodo(id: string) {
+  todos.value = todos.value.filter((t) => t.id !== id);
+}
 </script>
 
 <template>
@@ -16,32 +33,13 @@
       <div class="card-body space-y-4">
         <h2 class="card-title">Do It</h2>
 
-        <div class="flex gap-2">
-          <input
-            v-model="title"
-            type="text"
-            placeholder="What do you need to do?"
-            class="input input-bordered flex-1"
-          />
-          <button class="btn btn-primary" @click="addTodo">
-            Add
-          </button>
-        </div>
+        <TodoForm @submit="addTodo" />
 
-        <div v-if="todos.length === 0" class="alert alert-info">
-          <span>No todos yet. Add your first one above.</span>
-        </div>
-
-        <ul v-else class="space-y-2">
-          <li
-            v-for="todo in todos"
-            :key="todo"
-            class="flex items-center gap-2"
-          >
-            <input type="checkbox" class="checkbox checkbox-sm" />
-            <span>{{ todo }}</span>
-          </li>
-        </ul>
+        <TodoList
+          :todos="todos"
+          @toggle-complete="toggleTodoComplete"
+          @delete="deleteTodo"
+        />
       </div>
     </div>
   </div>

@@ -5,10 +5,6 @@
   logs: true;
 }
 
-body {
-  @apply bg-gray-100 text-gray-800;
-}
-
 .app-shell {
-  @apply max-w-2xl mx-auto p-8;
+  @apply max-w-2xl mx-auto p-4;
 }
