@@ -11,34 +11,38 @@
 </script>
 
 <template>
-  <div style="max-width: 600px; margin: 2rem auto;">
-    <n-card title="Todo MVP (Vue)">
-      <n-space vertical size="large">
-        <!-- Input + button row -->
-        <n-space>
-          <n-input
-            v-model:value="title"
-            placeholder="What do you need to do?"
-          />
-          <n-button type="primary" @click="addTodo">
-            Add
-          </n-button>
-        </n-space>
+  <div class="app-shell">
+    <div class="card bg-base-100 shadow-lg">
+      <div class="card-body space-y-4">
+        <h2 class="card-title">Do It</h2>
 
-        <!-- List -->
-        <div v-if="todos.length === 0">
-          <n-alert type="info" title="No todos yet">
-            Add your first todo above.
-          </n-alert>
+        <div class="flex gap-2">
+          <input
+            v-model="title"
+            type="text"
+            placeholder="What do you need to do?"
+            class="input input-bordered flex-1"
+          />
+          <button class="btn btn-primary" @click="addTodo">
+            Add
+          </button>
         </div>
-        <n-list v-else>
-          <n-list-item v-for="todo in todos" :key="todo">
-            {{ todo }}
-          </n-list-item>
-        </n-list>
-      </n-space>
-    </n-card>
+
+        <div v-if="todos.length === 0" class="alert alert-info">
+          <span>No todos yet. Add your first one above.</span>
+        </div>
+
+        <ul v-else class="space-y-2">
+          <li
+            v-for="todo in todos"
+            :key="todo"
+            class="flex items-center gap-2"
+          >
+            <input type="checkbox" class="checkbox checkbox-sm" />
+            <span>{{ todo }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
-
-<style scoped></style>

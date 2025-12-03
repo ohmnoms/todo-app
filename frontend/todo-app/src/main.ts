@@ -1,12 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import './style.css';
+import './main.css';
 
 import {
   VueQueryPlugin,
   type VueQueryPluginOptions,
 } from '@tanstack/vue-query';
-import { createNaiveUI } from './plugins/naive-ui';
 
 const app = createApp(App);
 
@@ -24,6 +23,4 @@ const vueQueryOptions: VueQueryPluginOptions = {
 
 app.use(VueQueryPlugin, vueQueryOptions);
 
-// UI library
-app.use(createNaiveUI());
 app.mount('#app')

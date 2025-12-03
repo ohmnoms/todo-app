@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: nord --default, abyss --prefersdark, cupcake, dracula;
+  root: ":root";
+  logs: true;
+}
+
+body {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.app-shell {
+  @apply max-w-2xl mx-auto p-8;
+}

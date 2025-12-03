@@ -1,7 +1,7 @@
-import { TodoItem } from "@/models/todo-item";
-import { UpdateTodoRequest } from "@/models/update-todo-request";
+import type { TodoItem } from "@/models/todo-item";
+import type { UpdateTodoRequest } from "@/models/update-todo-request";
 import api from "./client";
-import { CreateTodoRequest } from "@/models/create-todo-request";
+import type { CreateTodoRequest } from "@/models/create-todo-request";
 
 export async function getTodos(): Promise<TodoItem[]> {
   const res = await api.get<TodoItem[]>('/todo');
