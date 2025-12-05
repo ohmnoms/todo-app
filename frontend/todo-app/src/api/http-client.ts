@@ -1,0 +1,49 @@
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+
+async function request<T>(input: string, init?: RequestInit): Promise<T> {
+	const res = await fetch(`${BASE_URL}${input}`, {
+		headers: {
+			'Content-Type': 'application/json',
+			...(init?.headers ?? {}),
+		},
+		...init,
+	});
+
+	if (!res.ok) {
+		// You can shape this however you want
+		const errorBody = await res.text().catch(() => '');
+		throw new Error(`HTTP ${res.status}: ${errorBody || res.statusText}`);
+	}
+
+	return (await res.json()) as T;
+}
+
+export const httpClient = {
+	get<T>(url: string, init?: RequestInit) {
+		return request<T>(url, { method: 'GET', ...init });
+	},
+	post<T>(url: string, body?: unknown, init?: RequestInit) {
+		return request<T>(url, {
+			method: 'POST',
+			body: body ? JSON.stringify(body) : undefined,
+			...init,
+		});
+	},
+	put<T>(url: string, body?: unknown, init?: RequestInit) {
+		return request<T>(url, {
+			method: 'PUT',
+			body: body ? JSON.stringify(body) : undefined,
+			...init,
+		});
+	},
+	patch<T>(url: string, body?: unknown, init?: RequestInit) {
+		return request<T>(url, {
+			method: 'PATCH',
+			body: body ? JSON.stringify(body) : undefined,
+			...init,
+		});
+	},
+	delete<T>(url: string, init?: RequestInit) {
+		return request<T>(url, { method: 'DELETE', ...init });
+	},
+};

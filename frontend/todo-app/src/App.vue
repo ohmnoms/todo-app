@@ -1,30 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import TodoForm from './components/TodoForm.vue';
 import TodoList from './components/TodoList.vue';
-import type { TodoItem } from '@/models/todo-item';
+import { useTodos } from './composables/use-todos';
 
-const todos = ref<TodoItem[]>([]);
-
-function addTodo(title: string) {
-  const newTodo: TodoItem = {
-    id: crypto.randomUUID(), // TEMP
-    title,
-    isCompleted: false,
-  };
-
-  todos.value = [...todos.value, newTodo];
-}
-
-function toggleTodoComplete(id: string) {
-  todos.value = todos.value.map((t) =>
-    t.id === id ? { ...t, isCompleted: !t.isCompleted } : t,
-  );
-}
-
-function deleteTodo(id: string) {
-  todos.value = todos.value.filter((t) => t.id !== id);
-}
+const { todos, loading, error, addTodo, toggleTodo, removeTodo } = useTodos();
 </script>
 
 <template>
@@ -34,11 +13,13 @@ function deleteTodo(id: string) {
         <h2 class="card-title">Do It</h2>
 
         <TodoForm @submit="addTodo" />
-
+        
+        <div v-if="loading">Loading…</div>
+        <div v-else-if="error">Error: {{ String(error) }}</div>
         <TodoList
           :todos="todos"
-          @toggle-complete="toggleTodoComplete"
-          @delete="deleteTodo"
+          @toggle-complete="toggleTodo"
+          @delete="removeTodo"
         />
       </div>
     </div>

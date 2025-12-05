@@ -2,21 +2,46 @@ using Microsoft.EntityFrameworkCore;
 using Todo.Api.Services;
 using Todo.Api.Persistence;
 using Todo.Api.Common;
+using Microsoft.OpenApi;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
+
+// Swagger docs
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Todo.Api",
+        Version = "v1",
+        Description = "Simple Todo API for the Vue 'Do It' app."
+    });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+    else
+    {
+        // Temporary: helps confirm path issues while debugging
+        Console.WriteLine($"XML comments file not found: {xmlPath}");
+    }
+});
 
 // Dependency Injection
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITodoService, TodoService>();
 
 builder.Services.AddDbContext<TodoDbContext>(
-    opts => opts.UseInMemoryDatabase("TodoDb")
+    options => options.UseInMemoryDatabase("TodoDb")
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
 );
 
@@ -30,11 +55,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    
+    app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo.Api v1");
+        options.RoutePrefix = string.Empty;
     });
 }
 
