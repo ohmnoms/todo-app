@@ -36,6 +36,15 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy
+            .WithOrigins("http://localhost:5173") // Vite dev URL
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 // Dependency Injection
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITodoService, TodoService>();
@@ -65,6 +74,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandler>();
 app.UseHttpsRedirection();
+app.UseCors();
 app.MapControllers();
 app.UseHealthChecks("/health");
 

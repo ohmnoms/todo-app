@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const props = defineProps<{
-  busy?: string;
+defineProps<{
+  busy?: boolean;
 }>();
 
 const emit = defineEmits<{

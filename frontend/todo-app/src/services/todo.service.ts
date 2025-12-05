@@ -1,4 +1,4 @@
-import { httpClient } from '../api/http-client';
+import { httpClient } from '../api/httpClient';
 import type { TodoItem } from '../models/todo-item';
 
 export const todoService = {
