@@ -57,7 +57,7 @@ watch(title, (newVal) => {
 </script>
 
 <template>
-  <form class="flex gap-2" @submit.prevent="onSubmit">
+  <form data-testid="todo-form" class="flex gap-2" @submit.prevent="onSubmit">
     <div class="form-control">
       <label class="label">
         <span class="label-text">Title</span>
@@ -68,6 +68,7 @@ watch(title, (newVal) => {
 
       <input
         v-model="title"
+        data-testid="todo-input"
         @blur="onTitleBlur"
         :maxlength="maxTitleLength"
         type="text"

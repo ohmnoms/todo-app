@@ -2,6 +2,7 @@
 import type { TodoItem } from '@/models/todo-item';
 import SingleTodoItem from './SingleTodoItem.vue';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{
   todos: TodoItem[];
 }>();
@@ -17,7 +18,7 @@ const emit = defineEmits<{
     <span>No todos yet. Add your first one above.</span>
   </div>
 
-  <ul v-else class="space-y-2">
+  <ul v-else class="space-y-2" data-testid="todo-list">
     <SingleTodoItem
       v-for="todo in todos"
       :key="todo.id"

@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
@@ -15,5 +16,11 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+  },
+  test: {
+    globals: true,
+    root: './tests',
+    environment: 'happy-dom',
+    setupFiles: './vitest.setup.ts'
   },
 })

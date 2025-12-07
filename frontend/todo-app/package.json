@@ -13,11 +13,18 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@tanstack/vue-query": "^5.92.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/vue": "^8.1.0",
     "daisyui": "^5.5.7",
+    "happy-dom": "^20.0.11",
+    "vitest": "^4.0.15",
     "vue": "^3.5.25"
   },
   "devDependencies": {

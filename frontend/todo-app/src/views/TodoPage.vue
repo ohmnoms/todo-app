@@ -18,10 +18,8 @@ const isLoading = computed(() => todosQuery.isPending.value);
       @submit="(title: string) => createTodo.mutate(title)"
     />
 
-    <!-- Show skeleton loader while loading -->
-    <TodoItemSkeletonLoader v-if="isLoading" />
+    <TodoItemSkeletonLoader v-if="isLoading" data-testid="todo-skeleton" />
 
-    <!-- Once loaded (or errored with stale data), render list -->
     <TodoList
       v-else
       :todos="todos"
