@@ -3,7 +3,7 @@ using Todo.Api.Models.Domain;
 
 namespace Todo.Api.Persistence;
 
-public class TodoRepository(TodoDbContext db) : ITodoRepository
+public class TodoItemsRepository(TodoDbContext db) : ITodoItemsRepository
 {
     private readonly TodoDbContext _db = db;
 

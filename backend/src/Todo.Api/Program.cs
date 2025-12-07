@@ -46,17 +46,20 @@ builder.Services.AddCors(options =>
 });
 
 // Dependency Injection
-builder.Services.AddScoped<ITodoRepository, TodoRepository>();
-builder.Services.AddScoped<ITodoService, TodoService>();
+builder.Services.AddScoped<ITodoItemsRepository, TodoItemsRepository>();
+builder.Services.AddScoped<ITodoItemsService, TodoItemsService>();
 
 builder.Services.AddDbContext<TodoDbContext>(
     options => options.UseInMemoryDatabase("TodoDb")
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
 );
 
-// Persisted SQLite database configuration
-// builder.Services.AddDbContext<TodoDbContext>(options =>
-//     options.UseSqlite(builder.Configuration.GetConnectionString("TodoDb")));
+//Persisted SQLite database configuration
+builder.Services.AddDbContext<TodoDbContext>(options =>
+{   
+    options.UseSqlite(builder.Configuration.GetConnectionString("TodoDb"))
+        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+});
 
 
 var app = builder.Build();

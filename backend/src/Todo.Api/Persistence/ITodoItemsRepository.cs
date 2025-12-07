@@ -2,7 +2,7 @@ using Todo.Api.Models.Domain;
 
 namespace Todo.Api.Persistence;
 
-public interface ITodoRepository
+public interface ITodoItemsRepository
 {
     Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default);
     Task<TodoItem?> GetByIdAsync(Guid id, CancellationToken ct = default);

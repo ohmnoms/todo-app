@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Todo.Api.Models.Configuration;
 using Todo.Api.Models.Domain;
 
 namespace Todo.Api.Persistence;

@@ -11,9 +11,9 @@ namespace Todo.Api.Controllers;
 /// <param name="todoService"></param>
 [ApiController]
 [Route("api/[controller]")]
-public class TodosController(ITodoService todoService) : ControllerBase
+public class TodosController(ITodoItemsService todoService) : ControllerBase
 {
-    private readonly ITodoService _todoService = todoService;
+    private readonly ITodoItemsService _todoService = todoService;
 
     /// <summary>
     /// Gets all Todo items.

@@ -4,7 +4,7 @@ using Todo.Api.Persistence;
 
 namespace Todo.Api.Services;
 
-public interface ITodoService
+public interface ITodoItemsService
 {
     Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default);
     Task<TodoItem> GetByIdAsync(Guid id, CancellationToken ct = default);
@@ -13,9 +13,9 @@ public interface ITodoService
     Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
-public class TodoService(ITodoRepository repository) : ITodoService
+public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsService
 {
-    private readonly ITodoRepository _repository = repository;
+    private readonly ITodoItemsRepository _repository = repository;
 
     public async Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default)
     {

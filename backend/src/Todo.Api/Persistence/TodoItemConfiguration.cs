@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Todo.Api.Models.Domain;
 
-namespace Todo.Api.Models.Configuration;
+namespace Todo.Api.Persistence;
 
 public class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
 {
