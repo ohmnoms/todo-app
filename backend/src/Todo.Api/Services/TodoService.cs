@@ -9,7 +9,7 @@ public interface ITodoService
     Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default);
     Task<TodoItem> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<TodoItem> CreateAsync(CreateTodoRequest request, CancellationToken ct = default);
-    Task<TodoItem> UpdateAsync(UpdateTodoRequest request, CancellationToken ct = default);
+    Task<TodoItem> UpdateAsync(Guid id, UpdateTodoRequest request, CancellationToken ct = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
@@ -42,10 +42,10 @@ public class TodoService(ITodoRepository repository) : ITodoService
         return await _repository.AddAsync(todo, ct);
     }
 
-    public async Task<TodoItem> UpdateAsync(UpdateTodoRequest request, CancellationToken ct = default)
+    public async Task<TodoItem> UpdateAsync(Guid id, UpdateTodoRequest request, CancellationToken ct = default)
     {
-        var todo = await _repository.GetByIdAsync(request.Id, ct) 
-            ?? throw new KeyNotFoundException($"Todo item with id {request.Id} not found.");
+        var todo = await _repository.GetByIdAsync(id, ct) 
+            ?? throw new KeyNotFoundException($"Todo item with id {id} not found.");
             
         todo.Title = request.Title;
         todo.IsCompleted = request.IsCompleted;

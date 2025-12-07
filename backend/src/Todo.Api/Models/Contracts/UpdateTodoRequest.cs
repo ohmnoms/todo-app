@@ -6,10 +6,6 @@ namespace Todo.Api.Models.Contracts;
 public record UpdateTodoRequest 
 {
     /// <summary>
-    /// The ID of the Todo item.
-    /// </summary>
-    public Guid Id { get; init; }
-    /// <summary>
     /// The title of the Todo item.
     /// </summary>
     public string Title { get; init; } = string.Empty;

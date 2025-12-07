@@ -69,20 +69,21 @@ public class TodosController(ITodoService todoService) : ControllerBase
     /// <summary>
     /// Updates an existing Todo item.
     /// </summary>
+    /// <param name="id">The ID of the Todo item to update.</param>
     /// <param name="request">The updated Todo item.</param>
     /// <returns>The updated Todo item.</returns>
     /// <response code="200">Returns the updated Todo item</response>
     /// <response code="400">If the request is invalid</response>
     /// <response code="404">If the Todo item is not found</response>
     /// <response code="500">If there is an internal server error</response>
-    [HttpPut]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(TodoItem), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateTodo([FromBody] UpdateTodoRequest request)
+    public async Task<IActionResult> UpdateTodo(Guid id, [FromBody] UpdateTodoRequest request)
     {
-        var todo = await _todoService.UpdateAsync(request);
+        var todo = await _todoService.UpdateAsync(id, request);
         return Ok(todo);
     }
 

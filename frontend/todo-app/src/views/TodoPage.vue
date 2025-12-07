@@ -26,9 +26,9 @@ const isLoading = computed(() => todosQuery.isPending.value);
       v-else
       :todos="todos"
       @toggle-complete="(id: string) => {
-        const todo = todos.value.find((t: TodoItem) => t.id === id);
+        const todo = todos.find((t: TodoItem) => t.id === id);
         if (todo) {
-          updateTodo.mutate({ id: todo.id, patch: { isCompleted: !todo.isCompleted } });
+          updateTodo.mutate({ id: todo.id, patch: { ...todo, isCompleted: !todo.isCompleted } });
         }
       }"
       @delete="(id: string) => deleteTodo.mutate(id)"
