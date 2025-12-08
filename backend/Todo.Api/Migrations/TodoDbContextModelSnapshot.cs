@@ -29,6 +29,12 @@ namespace Todo.Api.Migrations
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan?>("DueTime")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");
 

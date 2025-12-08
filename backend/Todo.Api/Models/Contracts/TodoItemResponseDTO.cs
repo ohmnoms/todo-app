@@ -26,4 +26,12 @@ public record TodoItemResponseDTO
     /// The date and time when the Todo item was completed.
     /// </summary>
     public DateTimeOffset? CompletedDate { get; set; }
+    /// <summary>
+    /// The date on which the Todo item is due.
+    /// </summary>
+    public DateOnly? DueDate { get; set; }
+    /// <summary>
+    /// The time of day at which the Todo item is due.
+    /// </summary>
+    public TimeOnly? DueTime { get; set; }
 }

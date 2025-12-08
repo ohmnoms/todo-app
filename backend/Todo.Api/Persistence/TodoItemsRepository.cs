@@ -13,11 +13,20 @@ public class TodoItemsRepository(TodoDbContext db) : ITodoItemsRepository
             .TodoItems
             .ToListAsync(ct);
 
-        // Returning a sorted list in memory is a limitation of SQLite.
-        // SQL Server knows what to do with ordering DateTimeOffset columns.
-        // In a production scenario with large tables I would want server-side ordering,
-        // But this is sufficient for the a small data set in this demo app.
-        return [.. todos.OrderBy(t => t.CreatedDate)];
+            // Sort by completion status first (incomplete items come first),
+            // then by presence of due date/time (items with due dates come first),
+            // then by due date, due time and finally by creation date. This ensures that
+            // incomplete upcoming tasks appear at the top and completed tasks appear last.
+            //
+            // Sorting outside the database as a limitation of SQLite's handling of DateTimeOffset
+            // and the custom conversions for DateOnly and TimeOnly make it complex to express.
+            // For larger datasets, I would consider implementing sorting in the database layer.
+            return [.. todos
+                .OrderBy(t => t.IsCompleted)
+                .ThenBy(t => t.DueDate.HasValue ? 0 : 1)
+                .ThenBy(t => t.DueDate)
+                .ThenBy(t => t.DueTime)
+                .ThenBy(t => t.CreatedDate)];
     }
 
     public async Task<TodoItem?> GetByIdAsync(Guid id, CancellationToken ct = default)

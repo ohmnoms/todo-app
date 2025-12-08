@@ -33,6 +33,8 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
     public async Task<TodoItem> CreateAsync(CreateTodoRequest request, CancellationToken ct = default)
     {
         await TodoItemValidator.ValidateTitleAsync(request.Title, ct);
+        await TodoItemValidator.ValidateDueDateAsync(request.DueDate, ct);
+        await TodoItemValidator.ValidateDueTimeAsync(request.DueTime, ct);
 
         var todo = new TodoItem
         {
@@ -52,6 +54,8 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
             ?? throw new KeyNotFoundException($"Todo item with id {id} not found.");
 
         await TodoItemValidator.ValidateTitleAsync(request.Title, ct);
+        await TodoItemValidator.ValidateDueDateAsync(request.DueDate, ct);
+        await TodoItemValidator.ValidateDueTimeAsync(request.DueTime, ct);
         
         todo.Title = request.Title;
         todo.IsCompleted = request.IsCompleted;

@@ -31,6 +31,16 @@ public record TodoItem
     /// The date and time when the Todo item was completed.
     /// </summary>
     public DateTimeOffset? CompletedDate { get; set; }
+    /// <summary>
+    /// The date on which the Todo item is due. Date-only to allow setting
+    /// a calendar date without requiring a time of day.
+    /// </summary>
+    public DateOnly? DueDate { get; set; }
+    /// <summary>
+    /// The time of day at which the Todo item is due. Time-only to allow
+    /// fine‑grained control over deadlines without affecting the calendar date.
+    /// </summary>
+    public TimeOnly? DueTime { get; set; }
 
     public TodoItemResponseDTO ToDTO()
     {
@@ -40,7 +50,9 @@ public record TodoItem
             Title = Title,
             IsCompleted = IsCompleted,
             CreatedDate = CreatedDate,
-            CompletedDate = CompletedDate
+            CompletedDate = CompletedDate,
+            DueDate = DueDate,
+            DueTime = DueTime,
         };
     }
 }
