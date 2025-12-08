@@ -5,7 +5,7 @@ export const todoService = {
 	getTodos() {
 		return httpClient.get<TodoItem[]>('/todos');
 	},
-	createTodo(payload: Pick<TodoItem, 'title'>) {
+	createTodo(payload: { title: string; dueDate?: string | null; dueTime?: string | null }) {
 		return httpClient.post<TodoItem>('/todos', payload);
 	},
 	updateTodo(id: string, payload: Partial<TodoItem>) {

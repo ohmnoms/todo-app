@@ -59,22 +59,8 @@ public static class TodoItemValidator
     /// </summary>
     public static async Task ValidateDueTimeAsync(TimeOnly? dueTime, CancellationToken ct = default)
     {
-        // no-op if no due time provided
-        if (dueTime is null)
-        {
-            return;
-        }
-        var errors = new Dictionary<string, List<string>>();
-        // Compare using current date in system time zone
-        var currentTime = TimeOnly.FromDateTime(DateTimeOffset.Now.Date);
-        if (dueTime.Value < currentTime)
-        {
-            AddError(errors, "dueTime", "Due time cannot be in the past.");
-        }
-        if (errors.Count > 0)
-        {
-            throw new ValidationException(errors.ToDictionary(e => e.Key, e => e.Value.ToArray()));
-        }
+        // This is here for parity and future-proofing.
+        return;
     }
 
     private static void AddError(

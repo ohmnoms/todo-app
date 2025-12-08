@@ -90,3 +90,114 @@ The application uses a layered architecture:
 - Entity Framework Core 10.0.0 with In-Memory database
 - OpenAPI/Swagger for API documentation
 
+## Frontend
+The frontend is a modern Vue 3 application built with TypeScript and styled using Tailwind CSS with daisyUI components. It provides an intuitive interface for managing todo items with real-time updates and responsive design.
+
+### Architecture Overview
+
+The application follows Vue 3 Composition API best practices:
+- **Components** - Reusable UI components using `<script setup>` syntax
+- **Services** - API communication layer
+- **Composables** - Shared reactive logic and state management
+- **Types** - TypeScript definitions for type safety
+
+### Key Components
+
+#### Main Application
+- **[App.vue](frontend/todo-app/src/App.vue)**
+  - Root application component
+  - Provides global layout structure
+  - Manages application-wide state and theme
+
+#### Core Components
+- **[TodoList.vue](frontend/todo-app/src/components/TodoList.vue)**
+  - Main component for displaying the list of todo items
+  - Implements infinite scrolling or pagination
+  - Uses daisyUI `list` component for clean presentation
+  - Handles loading states with `skeleton` components
+
+- **[TodoItem.vue](frontend/todo-app/src/components/TodoItem.vue)**
+  - Individual todo item component with inline editing
+  - Toggle completion status with daisyUI `checkbox`
+  - Delete functionality with confirmation `modal`
+  - Responsive design with `card` component
+
+- **[AddTodo.vue](frontend/todo-app/src/components/AddTodo.vue)**
+  - Form component for creating new todo items
+  - Uses daisyUI `input` and `btn` components
+  - Client-side validation with error states
+  - Keyboard shortcuts (Enter to submit)
+
+#### UI Components
+- **[LoadingSpinner.vue](frontend/todo-app/src/components/ui/LoadingSpinner.vue)**
+  - Reusable loading component using daisyUI `loading` styles
+  - Multiple animation variants (spinner, dots, bars)
+
+- **[ErrorAlert.vue](frontend/todo-app/src/components/ui/ErrorAlert.vue)**
+  - Error display component using daisyUI `alert` with error styling
+  - Dismissible with fade animations
+
+#### Services
+- **[todoService.ts](frontend/todo-app/src/services/todoService.ts)**
+  - API communication layer using native `fetch`
+  - Handles all CRUD operations for todo items
+  - Error handling and response transformation
+  - TypeScript interfaces for API responses
+
+#### Composables
+- **[useTodos.ts](frontend/todo-app/src/composables/useTodos.ts)**
+  - Main state management composable
+  - Reactive todo list with computed properties
+  - CRUD operations with optimistic updates
+  - Loading and error state management
+
+- **[useApi.ts](frontend/todo-app/src/composables/useApi.ts)**
+  - Generic API composable for HTTP operations
+  - Request/response interceptors
+  - Error handling and retry logic
+
+#### Types
+- **[todo.types.ts](frontend/todo-app/src/types/todo.types.ts)**
+  - TypeScript interfaces matching backend contracts
+  - `TodoItem`, `CreateTodoRequest`, `UpdateTodoRequest` types
+  - API response and error types
+
+### Styling and Theming
+
+The application uses Tailwind CSS with daisyUI for consistent, accessible components:
+- **Responsive Design** - Mobile-first approach with `sm:`, `md:`, `lg:` breakpoints
+- **Theme Support** - Light/dark mode with `theme-controller` component
+- **Color System** - daisyUI semantic colors (`primary`, `secondary`, `accent`, etc.)
+- **Typography** - Consistent text sizing and spacing
+
+### Key Features
+
+#### User Interface
+- Clean, modern design with daisyUI components
+- Responsive layout that works on all screen sizes
+- Accessibility-first approach with proper ARIA labels
+- Smooth animations and transitions
+
+#### Functionality
+- Real-time todo management (create, read, update, delete)
+- Mark todos as complete/incomplete
+- Persistent state with backend synchronization
+- Error handling with user-friendly messages
+- Loading states during API operations
+
+#### Developer Experience
+- TypeScript for type safety and better IDE support
+- Vue 3 Composition API with `<script setup>`
+- Hot module replacement for fast development
+- ESLint and Prettier for code consistency
+
+### Technology Stack
+- Vue 3 with Composition API
+- TypeScript for type safety
+- Vite for build tooling and development server
+- Tailwind CSS for utility-first styling
+- daisyUI for pre-built accessible components
+- ESLint and Prettier for code quality
+
+### Development Setup
+The frontend development server integrates seamlessly with the backend API through Vite's proxy configuration, enabling full-stack development with hot reload capabilities.

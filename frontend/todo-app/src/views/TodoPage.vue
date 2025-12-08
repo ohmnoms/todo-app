@@ -15,7 +15,7 @@ const isLoading = computed(() => todosQuery.isPending.value);
   <section class="space-y-4">
     <TodoForm
       :busy="createTodo.isPending.value"
-      @submit="(title: string) => createTodo.mutate(title)"
+      @submit="(payload: { title: string; dueDate?: string | null; dueTime?: string | null }) => createTodo.mutate(payload)"
     />
 
     <TodoItemSkeletonLoader v-if="isLoading" data-testid="todo-skeleton" />
@@ -30,6 +30,7 @@ const isLoading = computed(() => todosQuery.isPending.value);
         }
       }"
       @delete="(id: string) => deleteTodo.mutate(id)"
+      @update="(id: string, patch: Partial<TodoItem>) => updateTodo.mutate({ id, patch })"
     />
   </section>
 </template>

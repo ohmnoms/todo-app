@@ -18,7 +18,8 @@ export function useTodos() {
 
   // CREATE
   const createTodo = useMutation({
-    mutationFn: (title: string) => todoService.createTodo({ title }),
+    mutationFn: (payload: { title: string; dueDate?: string | null; dueTime?: string | null }) =>
+      todoService.createTodo(payload),
     onError: (err) => handleError(err, 'Failed to create todo'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
   });
