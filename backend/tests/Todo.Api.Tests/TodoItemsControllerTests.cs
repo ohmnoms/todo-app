@@ -94,11 +94,11 @@ public class TodosControllerTests
         var todoId = Guid.NewGuid();
         serviceMock.Setup(s => s.GetByIdAsync(todoId)).ThrowsAsync(new KeyNotFoundException());
 
-        // Act
-        var result = await _sut.GetTodoById(todoId);
-        
-        // Assert
-        Assert.IsType<NotFoundResult>(result);
+        // Act + Assert
+        // Middleware handles the ActionResults of exceptions
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _sut.GetTodoById(todoId)
+        );
     }
 
     [Fact]
@@ -109,6 +109,8 @@ public class TodosControllerTests
         {
             Title = "New todo"
         };
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>()))
+            .ReturnsAsync(new TodoItem { Id = Guid.NewGuid(), Title = "New todo" });
 
         // Act
         var result = await _sut.CreateTodo(createRequest);
@@ -131,7 +133,6 @@ public class TodosControllerTests
             Id = Guid.NewGuid(),
             Title = "New todo"
         };
-
         serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>())).ReturnsAsync(created);
 
         // Act
@@ -140,7 +141,29 @@ public class TodosControllerTests
         // Assert
         var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(nameof(_sut.GetTodoById), createdAtActionResult.ActionName);
-        var returnedTodo = Assert.IsType<TodoItem>(createdAtActionResult.Value);
+    }
+
+    [Fact]
+    public async Task Create_ReturnsCreatedTodo()
+    {
+        // Arrange
+        var createRequest = new CreateTodoRequest
+        {
+            Title = "New todo"
+        };
+
+        var created = new TodoItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "New todo"
+        };
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>())).ReturnsAsync(created);
+
+        // Act
+        var result = await _sut.CreateTodo(createRequest) as CreatedAtActionResult;
+
+        // Assert
+        var returnedTodo = Assert.IsType<TodoItem>(result?.Value);
         Assert.Equal("New todo", returnedTodo.Title);
     }
 
@@ -152,13 +175,14 @@ public class TodosControllerTests
         {
             Title = "" // Invalid: Title is required
         };
-        _sut.ModelState.AddModelError("Title", "The Title field is required.");
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>()))
+            .ThrowsAsync(new ArgumentException());
 
-        // Act
-        var result = await _sut.CreateTodo(createRequest);
-
-        // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        // Act & Assert
+        // Middleware handles controller exception ActionResults
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => _sut.CreateTodo(createRequest)
+        );
     }
 
     [Fact]
@@ -244,6 +268,7 @@ public class TodosControllerTests
     {
         // Arrange
         var todoId = Guid.NewGuid();
+        serviceMock.Setup(s => s.DeleteAsync(todoId)).ReturnsAsync(true);
 
         // Act
         var result = await _sut.DeleteTodo(todoId);
@@ -256,7 +281,8 @@ public class TodosControllerTests
     public async Task Delete_ReturnsNoContentResult()
     {
         // Arrange
-        var todoId = Guid.NewGuid();
+        var todoId = Guid.Empty;
+        serviceMock.Setup(s => s.DeleteAsync(todoId)).ReturnsAsync(true);
 
         // Act
         var result = await _sut.DeleteTodo(todoId);
@@ -269,13 +295,13 @@ public class TodosControllerTests
     public async Task Delete_TodoNotFound_ReturnsNotFoundResult()
     {
         // Arrange
-        var todoId = Guid.NewGuid();
+        var todoId = Guid.Empty;
         serviceMock.Setup(s => s.DeleteAsync(todoId)).ThrowsAsync(new KeyNotFoundException());
 
-        // Act
-        var result = await _sut.DeleteTodo(todoId);
-        
-        // Assert
-        Assert.IsType<NotFoundResult>(result);
+        // Act & Assert
+        // Middleware handles the ActionResults of exceptions
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _sut.DeleteTodo(todoId)
+        );
     }
 }

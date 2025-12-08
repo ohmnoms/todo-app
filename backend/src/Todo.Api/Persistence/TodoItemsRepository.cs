@@ -11,10 +11,13 @@ public class TodoItemsRepository(TodoDbContext db) : ITodoItemsRepository
     {
         var todos = await _db
             .TodoItems
-            .OrderBy(t => t.CreatedDate)
             .ToListAsync(ct);
 
-        return todos;
+        // Returning a sorted list in memory is a limitation of SQLite.
+        // SQL Server knows what to do with ordering DateTimeOffset columns.
+        // In a production scenario with large tables I would want server-side ordering,
+        // But this is sufficient for the a small data set in this demo app.
+        return [.. todos.OrderBy(t => t.CreatedDate)];
     }
 
     public async Task<TodoItem?> GetByIdAsync(Guid id, CancellationToken ct = default)

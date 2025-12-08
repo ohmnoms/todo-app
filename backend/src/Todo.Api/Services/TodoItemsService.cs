@@ -39,7 +39,8 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
             CreatedDate = DateTimeOffset.Now
         };
 
-        return await _repository.AddAsync(todo, ct);
+        await _repository.AddAsync(todo, ct);
+        return todo;
     }
 
     public async Task<TodoItem> UpdateAsync(Guid id, UpdateTodoRequest request, CancellationToken ct = default)
