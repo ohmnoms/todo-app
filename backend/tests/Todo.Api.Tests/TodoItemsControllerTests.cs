@@ -50,7 +50,7 @@ public class TodosControllerTests
         var result = await _sut.GetTodos() as OkObjectResult;
         
         // Assert
-        var returnedTodos = Assert.IsType<List<TodoItem>>(result?.Value);
+        var returnedTodos = Assert.IsType<List<TodoItemResponseDTO>>(result?.Value);
         Assert.Equal(2, returnedTodos.Count);
         Assert.Equal("Existing 1", returnedTodos[0].Title);
         Assert.Equal("Existing 2", returnedTodos[1].Title);
@@ -83,7 +83,7 @@ public class TodosControllerTests
         var result = await _sut.GetTodoById(todoId) as OkObjectResult;
         
         // Assert
-        var returnedTodo = Assert.IsType<TodoItem>(result?.Value);
+        var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
         Assert.Equal("Existing", returnedTodo.Title);
     }
 
@@ -163,7 +163,7 @@ public class TodosControllerTests
         var result = await _sut.CreateTodo(createRequest) as CreatedAtActionResult;
 
         // Assert
-        var returnedTodo = Assert.IsType<TodoItem>(result?.Value);
+        var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
         Assert.Equal("New todo", returnedTodo.Title);
     }
 
@@ -195,6 +195,14 @@ public class TodosControllerTests
             Title = "Updated todo",
             IsCompleted = true
         };
+        var updatedTodo = new TodoItem
+        {
+            Id = todoId,
+            Title = "Updated todo",
+            IsCompleted = true
+        };
+        serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))
+            .ReturnsAsync(updatedTodo);
 
         // Act
         var result = await _sut.UpdateTodo(todoId, updateRequest);
@@ -258,7 +266,7 @@ public class TodosControllerTests
         var result = await _sut.UpdateTodo(todoId, updateRequest) as OkObjectResult;
 
         // Assert
-        var returnedTodo = Assert.IsType<TodoItem>(result?.Value);
+        var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
         Assert.Equal("Updated todo", returnedTodo.Title);
         Assert.True(returnedTodo.IsCompleted);
     }

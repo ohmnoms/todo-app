@@ -1,16 +1,11 @@
-using Todo.Api.Models.Contracts;
 
-namespace Todo.Api.Models.Domain;
+namespace Todo.Api.Models.Contracts;
 
 /// <summary>
-/// Domain model representing a Todo item.
+/// Data transfer object representing a Todo item in API responses.
 /// </summary>
-public record TodoItem
+public record TodoItemResponseDTO
 {
-    /// <summary>
-    /// Maximum length for the title of a Todo item.
-    /// </summary>
-    public const int MaxTitleLength = 240;
     /// <summary>
     /// The unique identifier of the Todo item.
     /// </summary>
@@ -31,16 +26,4 @@ public record TodoItem
     /// The date and time when the Todo item was completed.
     /// </summary>
     public DateTimeOffset? CompletedDate { get; set; }
-
-    public TodoItemResponseDTO ToDTO()
-    {
-        return new TodoItemResponseDTO
-        {
-            Id = Id,
-            Title = Title,
-            IsCompleted = IsCompleted,
-            CreatedDate = CreatedDate,
-            CompletedDate = CompletedDate
-        };
-    }
 }

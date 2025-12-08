@@ -27,7 +27,8 @@ public class TodosController(ITodoItemsService todoService) : ControllerBase
     public async Task<IActionResult> GetTodos()
     {
         var todos = await _todoService.GetAllAsync();
-        return Ok(todos);
+        var todoDTOs = todos.Select(t => t.ToDTO()).ToList();
+        return Ok(todoDTOs);
     }
 
     /// <summary>
@@ -45,7 +46,7 @@ public class TodosController(ITodoItemsService todoService) : ControllerBase
     public async Task<IActionResult> GetTodoById(Guid id)
     {
         var todo = await _todoService.GetByIdAsync(id);
-        return Ok(todo);
+        return Ok(todo.ToDTO());
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public class TodosController(ITodoItemsService todoService) : ControllerBase
     public async Task<IActionResult> CreateTodo([FromBody] CreateTodoRequest request)
     {
         var todo = await _todoService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, todo);
+        return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, todo.ToDTO());
     }
 
     /// <summary>
@@ -84,7 +85,7 @@ public class TodosController(ITodoItemsService todoService) : ControllerBase
     public async Task<IActionResult> UpdateTodo(Guid id, [FromBody] UpdateTodoRequest request)
     {
         var todo = await _todoService.UpdateAsync(id, request);
-        return Ok(todo);
+        return Ok(todo.ToDTO());
     }
 
     /// <summary>
