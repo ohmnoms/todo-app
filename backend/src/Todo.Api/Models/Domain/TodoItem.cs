@@ -6,6 +6,10 @@ namespace Todo.Api.Models.Domain;
 public record TodoItem
 {
     /// <summary>
+    /// Maximum length for the title of a Todo item.
+    /// </summary>
+    public const int MaxTitleLength = 240;
+    /// <summary>
     /// The unique identifier of the Todo item.
     /// </summary>
     public Guid Id { get; set; }

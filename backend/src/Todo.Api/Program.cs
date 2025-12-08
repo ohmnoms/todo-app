@@ -25,17 +25,10 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     
-    if (File.Exists(xmlPath))
-    {
-        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
-    }
-    else
-    {
-        // Temporary: helps confirm path issues while debugging
-        Console.WriteLine($"XML comments file not found: {xmlPath}");
-    }
+    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
 
+// CORS configuration
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -49,20 +42,24 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<ITodoItemsRepository, TodoItemsRepository>();
 builder.Services.AddScoped<ITodoItemsService, TodoItemsService>();
 
-builder.Services.AddDbContext<TodoDbContext>(
-    options => options.UseInMemoryDatabase("TodoDb")
-        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment())
-);
-
 //Persisted SQLite database configuration
+var raw = builder.Configuration.GetConnectionString("TodosDb");
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, raw!);
+var connectionString = $"Data Source={dbPath}";
 builder.Services.AddDbContext<TodoDbContext>(options =>
 {   
-    options.UseSqlite(builder.Configuration.GetConnectionString("TodoDb"))
+    options.UseSqlite(connectionString)
         .EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
-
 var app = builder.Build();
+
+// Apply pending migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TodoDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,6 +1,7 @@
 using Todo.Api.Models.Contracts;
 using Todo.Api.Models.Domain;
 using Todo.Api.Persistence;
+using Todo.Api.Validation;
 
 namespace Todo.Api.Services;
 
@@ -31,6 +32,8 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
 
     public async Task<TodoItem> CreateAsync(CreateTodoRequest request, CancellationToken ct = default)
     {
+        await TodoItemValidator.ValidateTitleAsync(request.Title, ct);
+
         var todo = new TodoItem
         {
             Id = Guid.NewGuid(),
@@ -47,7 +50,9 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
     {
         var todo = await _repository.GetByIdAsync(id, ct) 
             ?? throw new KeyNotFoundException($"Todo item with id {id} not found.");
-            
+
+        await TodoItemValidator.ValidateTitleAsync(request.Title, ct);
+        
         todo.Title = request.Title;
         todo.IsCompleted = request.IsCompleted;
 

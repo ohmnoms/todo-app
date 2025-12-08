@@ -21,6 +21,7 @@ public class ExceptionHandler(RequestDelegate next, ILogger<ExceptionHandler> lo
             {
                 KeyNotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
                 ArgumentException => (StatusCodes.Status400BadRequest, "Invalid request"),
+                ValidationException => (StatusCodes.Status400BadRequest, "Validation failed"),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
             };
 
@@ -30,7 +31,11 @@ public class ExceptionHandler(RequestDelegate next, ILogger<ExceptionHandler> lo
                 Title = title,
                 Detail = ex.Message,
                 Instance = context.Request.Path
-            };
+        };
+            if (ex is ValidationException vex)
+            {
+                problem.Extensions["errors"] = vex.Errors;
+            }
 
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/problem+json";
