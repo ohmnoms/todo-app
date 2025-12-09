@@ -3,6 +3,8 @@ import { useErrorHandler } from '@/composables/useErrorHandler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { TodoItem } from '@/models/todo-item';
 import { computed } from 'vue';
+import type { UpdateTodoRequest } from '@/models/update-todo-request';
+import type { CreateTodoRequest } from '@/models/create-todo-request';
 
 export function useTodos() {
   const queryClient = useQueryClient();
@@ -18,7 +20,7 @@ export function useTodos() {
 
   // CREATE
   const createTodo = useMutation({
-    mutationFn: (payload: { title: string; dueDate?: string | null; dueTime?: string | null }) =>
+    mutationFn: (payload: CreateTodoRequest) =>
       todoService.createTodo(payload),
     onError: (err) => handleError(err, 'Failed to create todo'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
@@ -26,8 +28,18 @@ export function useTodos() {
 
   // UPDATE
   const updateTodo = useMutation({
-    mutationFn: (payload: { id: string; patch: Partial<TodoItem> }) =>
-      todoService.updateTodo(payload.id, payload.patch),
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<TodoItem> }) => {
+      const payload: UpdateTodoRequest = {
+        id,
+        title: patch.title,
+        isCompleted: patch.isCompleted,
+        dueDate: patch.dueDate ?? null,
+        dueTime: patch.dueTime ?? null,
+        completedDate: patch.completedDate ?? null,
+      };
+
+      return todoService.updateTodo(id, payload);
+    },
     onError: (err) => handleError(err, 'Failed to update todo'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
   });

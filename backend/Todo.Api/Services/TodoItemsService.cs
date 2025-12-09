@@ -41,7 +41,9 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
             Id = Guid.NewGuid(),
             Title = request.Title,
             IsCompleted = false,
-            CreatedDate = DateTimeOffset.Now
+            CreatedDate = DateTimeOffset.Now,
+            DueDate = request.DueDate,
+            DueTime = request.DueTime,
         };
 
         await _repository.AddAsync(todo, ct);
@@ -59,6 +61,9 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
         
         todo.Title = request.Title;
         todo.IsCompleted = request.IsCompleted;
+        todo.CompletedDate = request.CompletedDate;
+        todo.DueDate = request.DueDate;
+        todo.DueTime = request.DueTime;
 
         await _repository.UpdateAsync(todo, ct);
         return todo;

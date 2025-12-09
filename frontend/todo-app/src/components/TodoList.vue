@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TodoItem } from '@/models/todo-item';
 import SingleTodoItem from './SingleTodoItem.vue';
+import type { UpdateTodoRequest } from '@/models/update-todo-request';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{
@@ -10,7 +11,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'toggle-complete', id: string): void;
   (e: 'delete', id: string): void;
-  (e: 'update', id: string, payload: Partial<TodoItem>): void;
+  (e: 'update', id: string, payload: UpdateTodoRequest): void;
 }>();
 </script>
 
@@ -26,7 +27,7 @@ const emit = defineEmits<{
       :todo="todo"
       @toggle-complete="emit('toggle-complete', todo.id)"
       @delete="emit('delete', todo.id)"
-      @update="(payload) => emit('update', todo.id, payload)"
+      @update="(payload: UpdateTodoRequest) => emit('update', todo.id, payload)"
     />
   </ul>
 </template>

@@ -3,12 +3,14 @@ Small TODO app showcase using Vue and .NET Core
 
 This app is built with a .NET 10 ASP.NET Core backend and Vue 3 frontend as a monorepo app.
 
-## Referenced Documentation
+## Referenced Documentation & Utilities
 
 - [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/overview?view=aspnetcore-10.0)
 - [Vue.js](https://vuejs.org/guide/quick-start)
 - [daisyUI](https://daisyui.com/docs)
 - [tailwindcss](https://tailwindcss.com/docs/styling-with-utility-classes)
+- [Google Material Icons](https://fonts.google.com/icons)
+- [png2ico](https://www.png2ico.com/) to create favicon.ico
 
 ## Backend
 
