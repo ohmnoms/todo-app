@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Debug .NET API with dotnet watch
+      "name": "API - .NET (watch)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-api",
+      "program": "dotnet",
+      "args": [
+        "watch",
+        "run",
+        "--project",
+        "${workspaceFolder}/backend/Todo.Api/Todo.Api.csproj"
+      ],
+      "cwd": "${workspaceFolder}/backend/Todo.Api",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "console": "internalConsole"
+    },
+    {
+      // Launch Vue dev app in Chrome + start dev server task
+      "name": "Web - Vue dev server",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "npm run dev",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend/todo-app",
+      "cwd": "${workspaceFolder}/frontend/todo-app"
+    }
+  ],
+  "compounds": [
+    {
+      // One-click: start both API and Vue dev server
+      "name": "API + Web",
+      "configurations": [
+        "API - .NET (watch)",
+        "Web - Vue dev server"
+      ]
+    }
+  ]
+}

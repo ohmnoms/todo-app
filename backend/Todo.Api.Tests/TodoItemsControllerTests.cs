@@ -1,0 +1,348 @@
+using Moq;
+
+using Microsoft.AspNetCore.Mvc;
+using Todo.Api.Controllers;
+using Todo.Api.Models.Domain;
+using Todo.Api.Services;
+using Todo.Api.Models.Contracts;
+
+namespace Todo.Api.Tests;
+
+public class TodosControllerTests
+{
+    // Dependencies
+    private readonly Mock<ITodoItemsService> serviceMock;
+    
+    // System Under Test
+    private readonly TodosController _sut;
+
+    public TodosControllerTests()
+    {
+        serviceMock = new Mock<ITodoItemsService>();
+        _sut = new TodosController(serviceMock.Object);
+    }
+
+    [Fact]
+    public async Task Get_ReturnsOkResult()
+    {
+        // Arrange
+        var todos = new List<TodoItem> { new() { Id = Guid.NewGuid(), Title = "Existing" } };
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetAllAsync(request)).ReturnsAsync(todos);
+
+        // Act
+        var result = await _sut.GetTodos(request);
+        
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Get_ReturnsTodosFromService()
+    {
+        // Arrange
+        var todos = new List<TodoItem> { 
+            new() { Id = Guid.NewGuid(), Title = "Existing 1" },
+            new() { Id = Guid.NewGuid(), Title = "Existing 2" } 
+        };
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetAllAsync(request)).ReturnsAsync(todos);
+
+        // Act
+        var result = await _sut.GetTodos(request) as OkObjectResult;
+        
+        // Assert
+        var returnedTodos = Assert.IsType<List<TodoItemResponseDTO>>(result?.Value);
+        Assert.Equal(2, returnedTodos.Count);
+        Assert.Equal("Existing 1", returnedTodos[0].Title);
+        Assert.Equal("Existing 2", returnedTodos[1].Title);
+    }
+
+    [Fact]
+    public async Task GetById_TodoFound_ReturnsOkResult()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        var todo = new TodoItem { Id = todoId, Title = "Existing" };
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetByIdAsync(todoId, request)).ReturnsAsync(todo);
+
+        // Act
+        var result = await _sut.GetTodoById(todoId, request);
+        
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetById_TodoFound_ReturnsTodoFromService()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        var todo = new TodoItem { Id = todoId, Title = "Existing" };
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetByIdAsync(todoId, request)).ReturnsAsync(todo);
+
+        // Act
+        var result = await _sut.GetTodoById(todoId, request) as OkObjectResult;
+        
+        // Assert
+        var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
+        Assert.Equal("Existing", returnedTodo.Title);
+    }
+
+    [Fact]
+    public async Task GetById_TodoNotFound_ReturnsNotFoundResult()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetByIdAsync(todoId, request)).ThrowsAsync(new KeyNotFoundException());
+
+        // Act + Assert
+        // Middleware handles the ActionResults of exceptions
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _sut.GetTodoById(todoId, request)
+        );
+    }
+
+    [Fact]
+    public async Task Create_CallsServiceCreateAsync()
+    {
+        // Arrange
+        var createRequest = new CreateTodoRequest
+        {
+            Title = "New todo",
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>()))
+            .ReturnsAsync(new TodoItem { Id = Guid.NewGuid(), Title = "New todo" });
+
+        // Act
+        var result = await _sut.CreateTodo(createRequest);
+
+        // Assert
+        serviceMock.Verify(s => s.CreateAsync(It.Is<CreateTodoRequest>(r => r.Title == "New todo")), Times.Once);
+    }
+
+    [Fact]
+    public async Task Create_ReturnsCreatedAtActionResult()
+    {
+        // Arrange
+        var createdBy = new Guid();
+        var createRequest = new CreateTodoRequest
+        {
+            Title = "New todo",
+            CreatedBy = createdBy
+        };
+
+        var created = new TodoItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "New todo",
+            CreatedBy = createdBy
+        };
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>())).ReturnsAsync(created);
+
+        // Act
+        var result = await _sut.CreateTodo(createRequest);
+
+        // Assert
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+        Assert.Equal(nameof(_sut.GetTodoById), createdAtActionResult.ActionName);
+    }
+
+    [Fact]
+    public async Task Create_ReturnsCreatedTodo()
+    {
+        // Arrange
+        var createdBy = new Guid();
+        var createRequest = new CreateTodoRequest
+        {
+            Title = "New todo",
+            CreatedBy = createdBy
+        };
+
+        var created = new TodoItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "New todo",
+            CreatedBy = createdBy
+        };
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>())).ReturnsAsync(created);
+
+        // Act
+        var result = await _sut.CreateTodo(createRequest) as CreatedAtActionResult;
+
+        // Assert
+        var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
+        Assert.Equal("New todo", returnedTodo.Title);
+    }
+
+    [Fact]
+    public async Task Create_InvalidModel_ReturnsBadRequest()
+    {
+        // Arrange
+        var createdBy = new Guid();
+        var createRequest = new CreateTodoRequest
+        {
+            Title = "", // Invalid: Title is required,
+            CreatedBy = createdBy
+        };
+        serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>()))
+            .ThrowsAsync(new ArgumentException());
+
+        // Act & Assert
+        // Middleware handles controller exception ActionResults
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => _sut.CreateTodo(createRequest)
+        );
+    }
+
+    [Fact]
+    public async Task Update_CallsServiceUpdateAsync()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        var createdBy = new Guid();
+        var updateRequest = new UpdateTodoRequest
+        {
+            Title = "Updated todo",
+            IsCompleted = true,
+            CreatedBy = createdBy
+        };
+        var updatedTodo = new TodoItem
+        {
+            Id = todoId,
+            Title = "Updated todo",
+            IsCompleted = true,
+            CreatedBy = createdBy
+        };
+        serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))
+            .ReturnsAsync(updatedTodo);
+
+        // Act
+        var result = await _sut.UpdateTodo(todoId, updateRequest);
+
+        // Assert
+        serviceMock.Verify(s => s.UpdateAsync(
+            It.Is<Guid>(id => id == todoId),
+            It.Is<UpdateTodoRequest>(r => r.Title == "Updated todo" && r.IsCompleted)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Update_ReturnsOkResult()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        var createdBy = new Guid();
+        var updateRequest = new UpdateTodoRequest
+        {
+            Title = "Updated todo",
+            IsCompleted = true,
+            CreatedBy = createdBy
+        };
+
+        var updatedTodo = new TodoItem
+        {
+            Id = todoId,
+            Title = "Updated todo",
+            IsCompleted = true,
+            CreatedBy = createdBy
+        };
+
+        serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))
+            .ReturnsAsync(updatedTodo);
+
+        // Act
+        var result = await _sut.UpdateTodo(todoId, updateRequest);
+
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Update_ReturnsUpdatedTodo()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        var createdBy = new Guid();
+        var updateRequest = new UpdateTodoRequest
+        {
+            Title = "Updated todo",
+            IsCompleted = true,
+            CreatedBy = createdBy
+        };
+
+        var updatedTodo = new TodoItem
+        {
+            Id = todoId,
+            Title = "Updated todo",
+            IsCompleted = true,
+            CreatedBy = createdBy
+        };
+
+        serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))
+            .ReturnsAsync(updatedTodo);
+
+        // Act
+        var result = await _sut.UpdateTodo(todoId, updateRequest) as OkObjectResult;
+
+        // Assert
+        var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
+        Assert.Equal("Updated todo", returnedTodo.Title);
+        Assert.True(returnedTodo.IsCompleted);
+    }
+
+    [Fact]
+    public async Task Delete_CallsServiceDeleteAsync()
+    {
+        // Arrange
+        var todoId = Guid.NewGuid();
+        serviceMock.Setup(s => s.DeleteAsync(todoId)).ReturnsAsync(true);
+
+        // Act
+        var result = await _sut.DeleteTodo(todoId);
+
+        // Assert
+        serviceMock.Verify(s => s.DeleteAsync(It.Is<Guid>(id => id == todoId)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Delete_ReturnsNoContentResult()
+    {
+        // Arrange
+        var todoId = Guid.Empty;
+        serviceMock.Setup(s => s.DeleteAsync(todoId)).ReturnsAsync(true);
+
+        // Act
+        var result = await _sut.DeleteTodo(todoId);
+
+        // Assert
+        Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
+    public async Task Delete_TodoNotFound_ReturnsNotFoundResult()
+    {
+        // Arrange
+        var todoId = Guid.Empty;
+        serviceMock.Setup(s => s.DeleteAsync(todoId)).ThrowsAsync(new KeyNotFoundException());
+
+        // Act & Assert
+        // Middleware handles the ActionResults of exceptions
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => _sut.DeleteTodo(todoId)
+        );
+    }
+}

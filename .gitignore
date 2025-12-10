@@ -52,3 +52,9 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# SQLite / EF Core local db
+*.db
+*.db-shm
+*.db-wal
+*.db-journal

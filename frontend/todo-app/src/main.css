@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+  root: ":root";
+  logs: true;
+}
+
+.app-shell {
+  @apply max-w-2xl mx-auto p-4;
+}
