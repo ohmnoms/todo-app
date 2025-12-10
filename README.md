@@ -79,10 +79,10 @@ The frontend is a **Vue 3** single page application bootstrapped with **Vite** 
 graph TD
   Router[Vue Router] -->|navigates| Views[Views]
   Views -->|compose| Components[UI Components]
-  Components -->|call| Composables[Composables (useTodos, useApi)]
+  Components -->|call| Composables["Composables (useTodos, useApi)"]
   Composables -->|fetch| Services[HTTP Service]
-  Services -->|REST| API[(ASP.NET Core API)]
-  Components -->|style| Tailwind[daisyUI & Tailwind CSS]
+  Services -->|REST| API["(ASP.NET Core API)"]
+  Components -->|style| Tailwind["daisyUI & Tailwind CSS"]
 ```
 
 -   **App & routing** -- `App.vue` sets up the layout and theme switcher. Vue Router defines navigation (if extended beyond a single page) and lazy loads views.
