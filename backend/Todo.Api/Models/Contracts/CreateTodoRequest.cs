@@ -19,4 +19,8 @@ public record CreateTodoRequest
     /// Optional time of day at which the Todo item is due. Leave null for no due time.
     /// </summary>
     public TimeOnly? DueTime { get; init; }
+    /// <summary>
+    /// The identifier of the user who created the Todo item.
+    /// </summary>
+    public Guid CreatedBy { get; set; }
 }

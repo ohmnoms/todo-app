@@ -1,0 +1,36 @@
+{
+  "recommendations": [
+    // --- Backend (.NET) ---
+    "ms-dotnettools.csharp",                 // C# editing, OmniSharp / Roslyn LSP
+    "formulahendry.dotnet-test-explorer",    // Test runner explorer
+    "editorconfig.editorconfig",             // Respect .editorconfig rules
+    "ms-azuretools.vscode-bicep",            // (Optional) if you use infra-as-code
+    "ms-dotnettools.vscode-dotnet-runtime",  // Used by many .NET tools inside VS Code
+
+    // --- SQLite Viewer ---
+    "alexcvzz.vscode-sqlite",                // ⭐ BEST: SQLite browser inside VS Code tabs
+    "qwtel.sqlite-viewer",                   // Alternative minimal viewer
+
+    // --- Vue 3 / TypeScript ---
+    "Vue.volar",                             // Vue 3 syntax, type-checking, script setup
+    "Vue.vscode-typescript-vue-plugin",      // Improves TS support for .vue files
+    "dbaeumer.vscode-eslint",                // ESLint integration
+    "bradlc.vscode-tailwindcss",             // If you have any utility classes (optional)
+
+    // --- Frontend Essentials ---
+    "esbenp.prettier-vscode",                // Prettier formatting
+    "csstools.postcss",                      // CSS/SCSS support (if needed)
+    "streetsidesoftware.code-spell-checker", // Reduces typos in props, models, request files
+
+    // --- Git / Project Workflow ---
+    "github.vscode-github-actions",          // CI/CD YAML highlighting
+    "eamodio.gitlens",                       // GitLens for clean history and blame
+    "mhutchie.git-graph",                    // Git branch graph
+
+    // --- JSON, REST, HTTP ---
+    "humao.rest-client",                     // Test API endpoints right from VS Code
+
+    // --- Vue Query / API Debugging (Optional) ---
+    "rangav.vscode-thunder-client"           // Nice REST client alternative, GUI-based
+  ]
+}

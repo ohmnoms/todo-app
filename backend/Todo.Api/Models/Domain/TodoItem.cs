@@ -41,6 +41,10 @@ public record TodoItem
     /// fine‑grained control over deadlines without affecting the calendar date.
     /// </summary>
     public TimeOnly? DueTime { get; set; }
+    /// <summary>
+    /// The identifier of the user who created the Todo item.
+    /// </summary>
+    public Guid CreatedBy { get; set; }
 
     public TodoItemResponseDTO ToDTO()
     {
@@ -53,6 +57,7 @@ public record TodoItem
             CompletedDate = CompletedDate,
             DueDate = DueDate,
             DueTime = DueTime,
+            CreatedBy = CreatedBy
         };
     }
 }

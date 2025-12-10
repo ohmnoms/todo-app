@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Todo.Api.Common;
@@ -21,6 +22,7 @@ public class ExceptionHandler(RequestDelegate next, ILogger<ExceptionHandler> lo
             {
                 KeyNotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
                 ArgumentException => (StatusCodes.Status400BadRequest, "Invalid request"),
+                AuthenticationException => (StatusCodes.Status403Forbidden, "Authentication failed"),
                 ValidationException => (StatusCodes.Status400BadRequest, "Validation failed"),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
             };

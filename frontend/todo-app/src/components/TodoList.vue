@@ -2,6 +2,8 @@
 import type { TodoItem } from '@/models/todo-item';
 import SingleTodoItem from './SingleTodoItem.vue';
 import type { UpdateTodoRequest } from '@/models/update-todo-request';
+import { computed } from 'vue';
+import { useTodoFilters } from '@/composables/useTodoFilters';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{
@@ -13,9 +15,23 @@ const emit = defineEmits<{
   (e: 'delete', id: string): void;
   (e: 'update', id: string, payload: UpdateTodoRequest): void;
 }>();
+
+const { hideCompleted } = useTodoFilters();
+
+const hideCompletedModel = computed({
+  get: () => hideCompleted.value,
+  set: (value: boolean) => {
+    hideCompleted.value = value;
+  },
+});
 </script>
 
 <template>
+  <div class="flex items-center justify-between text-base-content/60">
+    <span>Hide Completed Todos</span>
+    <input type="checkbox" class="toggle" v-model="hideCompletedModel" />
+  </div>
+
   <div v-if="!todos.length" class="alert alert-info">
     <span>No todos yet. Add one above.</span>
   </div>

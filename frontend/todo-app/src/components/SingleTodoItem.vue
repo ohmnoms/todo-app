@@ -113,12 +113,12 @@ function isOverdue(todo: TodoItem): boolean {
       <div class="ml-auto flex items-center gap-1 flex-shrink-0">
         <button
           type="button"
-          class="btn btn-ghost btn-xs btn-circle"
+          class="btn btn-ghost btn-xs btn-circle text-accent"
           data-testid="todo-edit-button"
           @click.stop="startEdit"
           title="Edit todo"
         >
-          <span class="material-icons text-base-content/70">
+          <span class="material-icons">
             edit
           </span>
         </button>

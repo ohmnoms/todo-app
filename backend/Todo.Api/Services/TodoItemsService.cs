@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using Todo.Api.Models.Contracts;
 using Todo.Api.Models.Domain;
 using Todo.Api.Persistence;
@@ -7,8 +8,8 @@ namespace Todo.Api.Services;
 
 public interface ITodoItemsService
 {
-    Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default);
-    Task<TodoItem> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyList<TodoItem>> GetAllAsync(GetTodoRequest? request = null, CancellationToken ct = default);
+    Task<TodoItem> GetByIdAsync(Guid id, GetTodoRequest? request = null, CancellationToken ct = default);
     Task<TodoItem> CreateAsync(CreateTodoRequest request, CancellationToken ct = default);
     Task<TodoItem> UpdateAsync(Guid id, UpdateTodoRequest request, CancellationToken ct = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
@@ -18,14 +19,31 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
 {
     private readonly ITodoItemsRepository _repository = repository;
 
-    public async Task<IReadOnlyList<TodoItem>> GetAllAsync(CancellationToken ct = default)
+    /// <summary>
+    /// Gets all Todo items. This is currently filtered by CreatedBy to only get client user's todos.
+    /// You cannot call this method to get another user's Todo items.
+    /// </summary>
+    public async Task<IReadOnlyList<TodoItem>> GetAllAsync(GetTodoRequest? request, CancellationToken ct = default)
     {
-        return await _repository.GetAllAsync(ct);
+        if (request is null || request.CreatedBy is null)
+        {
+            throw new AuthenticationException("CreatedBy is required to get Todo items.");
+        }
+        return await _repository.GetAllAsync(request, ct);
     }
 
-    public async Task<TodoItem> GetByIdAsync(Guid id, CancellationToken ct = default)
+    /// <summary>
+    /// Gets Todo item by ID. 
+    /// This is currently filtered by CreatedBy to only get client user's todos.
+    /// You cannot call this method to get another user's Todo item.
+    /// </summary>
+    public async Task<TodoItem> GetByIdAsync(Guid id, GetTodoRequest? request, CancellationToken ct = default)
     {
-        var todo = await _repository.GetByIdAsync(id, ct) ??
+        if (request is null || request.CreatedBy is null)
+        {
+            throw new AuthenticationException("CreatedBy is required to get Todo items.");
+        }
+        var todo = await _repository.GetByIdAsync(id, request, ct) ??
             throw new KeyNotFoundException($"Todo item with id {id} not found.");
         return todo;
     }
@@ -44,6 +62,7 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
             CreatedDate = DateTimeOffset.Now,
             DueDate = request.DueDate,
             DueTime = request.DueTime,
+            CreatedBy = request.CreatedBy
         };
 
         await _repository.AddAsync(todo, ct);
@@ -52,7 +71,7 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
 
     public async Task<TodoItem> UpdateAsync(Guid id, UpdateTodoRequest request, CancellationToken ct = default)
     {
-        var todo = await _repository.GetByIdAsync(id, ct) 
+        var todo = await _repository.GetByIdAsync(id, ct: ct) 
             ?? throw new KeyNotFoundException($"Todo item with id {id} not found.");
 
         await TodoItemValidator.ValidateTitleAsync(request.Title, ct);
@@ -71,7 +90,7 @@ public class TodoItemsService(ITodoItemsRepository repository) : ITodoItemsServi
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var todo = await _repository.GetByIdAsync(id, ct) 
+        var todo = await _repository.GetByIdAsync(id, ct: ct) 
             ?? throw new KeyNotFoundException($"Todo item with id {id} not found.");
 
         await _repository.DeleteAsync(todo, ct);

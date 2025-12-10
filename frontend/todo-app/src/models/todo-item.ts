@@ -31,4 +31,6 @@ export interface TodoItem {
    * provided.
    */
   dueTime?: string | null;
+  /** Identifier for the creator of the todo item. */
+  createdBy: string;
 }

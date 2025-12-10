@@ -30,5 +30,11 @@ public class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : null)
             .HasColumnType("TEXT");
+
+        builder.Property(t => t.CreatedDate)
+            .IsRequired();
+        
+        builder.Property(t => t.CreatedBy)
+            .IsRequired();
     }
 }

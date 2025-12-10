@@ -1,12 +1,13 @@
 import { createApp } from 'vue'
-import App from './App.vue'
-import './main.css';
+import App from '@/App.vue'
+import '@/main.css';
+import router from '@/router';
 
 import {
   VueQueryPlugin,
   type VueQueryPluginOptions,
 } from '@tanstack/vue-query';
-import { showErrorToast } from './composables/useToasts';
+import { showErrorToast } from '@/composables/useToasts';
 
 const app = createApp(App);
 
@@ -22,6 +23,7 @@ const vueQueryOptions: VueQueryPluginOptions = {
   },
 };
 
+app.use(router);
 app.use(VueQueryPlugin, vueQueryOptions);
 
 // Global error handler for unhandled exceptions

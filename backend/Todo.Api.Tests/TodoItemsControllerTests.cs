@@ -27,10 +27,13 @@ public class TodosControllerTests
     {
         // Arrange
         var todos = new List<TodoItem> { new() { Id = Guid.NewGuid(), Title = "Existing" } };
-        serviceMock.Setup(s => s.GetAllAsync()).ReturnsAsync(todos);
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetAllAsync(request)).ReturnsAsync(todos);
 
         // Act
-        var result = await _sut.GetTodos();
+        var result = await _sut.GetTodos(request);
         
         // Assert
         Assert.IsType<OkObjectResult>(result);
@@ -44,10 +47,13 @@ public class TodosControllerTests
             new() { Id = Guid.NewGuid(), Title = "Existing 1" },
             new() { Id = Guid.NewGuid(), Title = "Existing 2" } 
         };
-        serviceMock.Setup(s => s.GetAllAsync()).ReturnsAsync(todos);
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetAllAsync(request)).ReturnsAsync(todos);
 
         // Act
-        var result = await _sut.GetTodos() as OkObjectResult;
+        var result = await _sut.GetTodos(request) as OkObjectResult;
         
         // Assert
         var returnedTodos = Assert.IsType<List<TodoItemResponseDTO>>(result?.Value);
@@ -62,10 +68,13 @@ public class TodosControllerTests
         // Arrange
         var todoId = Guid.NewGuid();
         var todo = new TodoItem { Id = todoId, Title = "Existing" };
-        serviceMock.Setup(s => s.GetByIdAsync(todoId)).ReturnsAsync(todo);
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetByIdAsync(todoId, request)).ReturnsAsync(todo);
 
         // Act
-        var result = await _sut.GetTodoById(todoId);
+        var result = await _sut.GetTodoById(todoId, request);
         
         // Assert
         Assert.IsType<OkObjectResult>(result);
@@ -77,10 +86,13 @@ public class TodosControllerTests
         // Arrange
         var todoId = Guid.NewGuid();
         var todo = new TodoItem { Id = todoId, Title = "Existing" };
-        serviceMock.Setup(s => s.GetByIdAsync(todoId)).ReturnsAsync(todo);
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetByIdAsync(todoId, request)).ReturnsAsync(todo);
 
         // Act
-        var result = await _sut.GetTodoById(todoId) as OkObjectResult;
+        var result = await _sut.GetTodoById(todoId, request) as OkObjectResult;
         
         // Assert
         var returnedTodo = Assert.IsType<TodoItemResponseDTO>(result?.Value);
@@ -92,12 +104,15 @@ public class TodosControllerTests
     {
         // Arrange
         var todoId = Guid.NewGuid();
-        serviceMock.Setup(s => s.GetByIdAsync(todoId)).ThrowsAsync(new KeyNotFoundException());
+        var request = new GetTodoRequest() {
+            CreatedBy = new Guid()
+        };
+        serviceMock.Setup(s => s.GetByIdAsync(todoId, request)).ThrowsAsync(new KeyNotFoundException());
 
         // Act + Assert
         // Middleware handles the ActionResults of exceptions
         await Assert.ThrowsAsync<KeyNotFoundException>(
-            () => _sut.GetTodoById(todoId)
+            () => _sut.GetTodoById(todoId, request)
         );
     }
 
@@ -107,7 +122,8 @@ public class TodosControllerTests
         // Arrange
         var createRequest = new CreateTodoRequest
         {
-            Title = "New todo"
+            Title = "New todo",
+            CreatedBy = new Guid()
         };
         serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>()))
             .ReturnsAsync(new TodoItem { Id = Guid.NewGuid(), Title = "New todo" });
@@ -123,15 +139,18 @@ public class TodosControllerTests
     public async Task Create_ReturnsCreatedAtActionResult()
     {
         // Arrange
+        var createdBy = new Guid();
         var createRequest = new CreateTodoRequest
         {
-            Title = "New todo"
+            Title = "New todo",
+            CreatedBy = createdBy
         };
 
         var created = new TodoItem
         {
             Id = Guid.NewGuid(),
-            Title = "New todo"
+            Title = "New todo",
+            CreatedBy = createdBy
         };
         serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>())).ReturnsAsync(created);
 
@@ -147,15 +166,18 @@ public class TodosControllerTests
     public async Task Create_ReturnsCreatedTodo()
     {
         // Arrange
+        var createdBy = new Guid();
         var createRequest = new CreateTodoRequest
         {
-            Title = "New todo"
+            Title = "New todo",
+            CreatedBy = createdBy
         };
 
         var created = new TodoItem
         {
             Id = Guid.NewGuid(),
-            Title = "New todo"
+            Title = "New todo",
+            CreatedBy = createdBy
         };
         serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>())).ReturnsAsync(created);
 
@@ -171,9 +193,11 @@ public class TodosControllerTests
     public async Task Create_InvalidModel_ReturnsBadRequest()
     {
         // Arrange
+        var createdBy = new Guid();
         var createRequest = new CreateTodoRequest
         {
-            Title = "" // Invalid: Title is required
+            Title = "", // Invalid: Title is required,
+            CreatedBy = createdBy
         };
         serviceMock.Setup(s => s.CreateAsync(It.IsAny<CreateTodoRequest>()))
             .ThrowsAsync(new ArgumentException());
@@ -190,16 +214,19 @@ public class TodosControllerTests
     {
         // Arrange
         var todoId = Guid.NewGuid();
+        var createdBy = new Guid();
         var updateRequest = new UpdateTodoRequest
         {
             Title = "Updated todo",
-            IsCompleted = true
+            IsCompleted = true,
+            CreatedBy = createdBy
         };
         var updatedTodo = new TodoItem
         {
             Id = todoId,
             Title = "Updated todo",
-            IsCompleted = true
+            IsCompleted = true,
+            CreatedBy = createdBy
         };
         serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))
             .ReturnsAsync(updatedTodo);
@@ -218,17 +245,20 @@ public class TodosControllerTests
     {
         // Arrange
         var todoId = Guid.NewGuid();
+        var createdBy = new Guid();
         var updateRequest = new UpdateTodoRequest
         {
             Title = "Updated todo",
-            IsCompleted = true
+            IsCompleted = true,
+            CreatedBy = createdBy
         };
 
         var updatedTodo = new TodoItem
         {
             Id = todoId,
             Title = "Updated todo",
-            IsCompleted = true
+            IsCompleted = true,
+            CreatedBy = createdBy
         };
 
         serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))
@@ -246,17 +276,20 @@ public class TodosControllerTests
     {
         // Arrange
         var todoId = Guid.NewGuid();
+        var createdBy = new Guid();
         var updateRequest = new UpdateTodoRequest
         {
             Title = "Updated todo",
-            IsCompleted = true
+            IsCompleted = true,
+            CreatedBy = createdBy
         };
 
         var updatedTodo = new TodoItem
         {
             Id = todoId,
             Title = "Updated todo",
-            IsCompleted = true
+            IsCompleted = true,
+            CreatedBy = createdBy
         };
 
         serviceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<UpdateTodoRequest>()))

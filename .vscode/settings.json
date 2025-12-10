@@ -1,0 +1,64 @@
+{
+  // General editor behavior
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.defaultFormatter": null, // let language-specific blocks decide
+
+  // C# / .NET
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp",
+    "editor.formatOnType": true
+  },
+
+  // TypeScript / JavaScript
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Vue single-file components
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ESLint + Prettier cooperation
+  "eslint.enable": true,
+  "eslint.workingDirectories": [
+    { "directory": "web", "changeProcessCWD": true }
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always"
+  },
+  "prettier.requireConfig": true, // .prettierrc is present in the project
+  // Dotnet convenience
+  "dotnet.defaultSolution": "todo-app.sln",
+
+  // Hide common noise
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.vscode": false
+  },
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/node_modules": true
+  },
+
+  // Vue / Volar tweaks (nice defaults)
+  "volar.codeLens.references": true,
+  "volar.codeLens.pugTools": false,
+  "volar.completion.autoImportComponent": true,
+  "vue.features.codeActions.enable": true
+}

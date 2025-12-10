@@ -3,4 +3,5 @@ export interface CreateTodoRequest {
   dueDate?: string | null;
   dueTime?: string | null;
   completedDate?: string | null; // As of now null on creation
+  createdBy: string;
 }

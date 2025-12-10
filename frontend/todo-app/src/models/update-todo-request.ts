@@ -5,4 +5,5 @@ export interface UpdateTodoRequest {
   dueDate?: string | null;
   dueTime?: string | null;
   completedDate?: string | null;
+  createdBy: string;
 }

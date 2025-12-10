@@ -2,21 +2,50 @@ import { todoService } from '@/services/todo.service';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { TodoItem } from '@/models/todo-item';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import type { UpdateTodoRequest } from '@/models/update-todo-request';
 import type { CreateTodoRequest } from '@/models/create-todo-request';
+import { useDeviceId } from '@/composables/useDeviceId';
+import type { GetTodoRequest } from '@/models/get-todo-request';
+import { useTodoFilters } from './useTodoFilters';
 
 export function useTodos() {
   const queryClient = useQueryClient();
   const { handleError } = useErrorHandler();
+  const deviceId = useDeviceId();
+  const { hideCompleted } = useTodoFilters();
 
   // READ
-  const todosQuery = useQuery({
-    queryKey: ['todos'],
-    queryFn: () => todoService.getTodos(),
+  const todosQuery = useQuery<TodoItem[]>({
+    queryKey: ['todos', { createdBy: deviceId }],
+    queryFn: async () => {
+      const payload: GetTodoRequest = {
+        createdBy: deviceId,
+      };
+
+      if (hideCompleted.value) payload.isCompleted = false;
+
+      try {
+        return await todoService.getTodos(payload);
+      } catch (err) {
+        handleError(err, 'Failed to load todos');
+        throw err;
+      }
+    },
   });
 
   const todos = computed<TodoItem[]>(() => todosQuery.data.value ?? []);
+  watch(hideCompleted, () => {
+    queryClient.invalidateQueries({ queryKey: ['todos'] });
+  });
+
+  // READ BY ID
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const todoByIdQuery = (id: string, payload: GetTodoRequest) => useQuery({
+    queryKey: ['todo', id, payload],
+    queryFn: () => todoService.getTodoById(id, payload),
+    enabled: !!id,
+  });
 
   // CREATE
   const createTodo = useMutation({
@@ -36,6 +65,7 @@ export function useTodos() {
         dueDate: patch.dueDate ?? null,
         dueTime: patch.dueTime ?? null,
         completedDate: patch.completedDate ?? null,
+        createdBy: deviceId,
       };
 
       return todoService.updateTodo(id, payload);

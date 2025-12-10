@@ -34,9 +34,24 @@ async function requestVoid(input: string, init?: RequestInit): Promise<void> {
   return;
 }
 
+function buildQuery(params?: Record<string, unknown>): string {
+  if (!params) return '';
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === null || value === undefined) return;
+    qs.set(key, String(value));
+  });
+  const s = qs.toString();
+  return s ? `?${s}` : '';
+}
+
 export const httpClient = {
-	get<T>(url: string, init?: RequestInit) {
-		return request<T>(url, { method: 'GET', ...init });
+	get<T>(url: string, query?: Record<string, unknown>, init?: RequestInit) {
+		const fullUrl = `${url}${buildQuery(query)}`;
+		return request<T>(fullUrl, {
+		method: 'GET',
+		...init,
+		});
 	},
 	post<T>(url: string, body?: unknown, init?: RequestInit) {
 		return request<T>(url, {

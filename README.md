@@ -11,6 +11,7 @@ This app is built with a .NET 10 ASP.NET Core backend and Vue 3 frontend as a mo
 - [tailwindcss](https://tailwindcss.com/docs/styling-with-utility-classes)
 - [Google Material Icons](https://fonts.google.com/icons)
 - [png2ico](https://www.png2ico.com/) to create favicon.ico
+- [vue-router](https://router.vuejs.org/guide/)
 
 ## Backend
 
@@ -27,7 +28,7 @@ The application uses a layered architecture:
 ### Key Components
 
 #### Controllers
-- **[TodoController](backend/src/Todo.Api/Controllers/TodoController.cs)**
+- **[TodoController](backend/Todo.Api/Controllers/TodoController.cs)**
     - RESTful API controller exposing CRUD operations for todo items
     - Endpoints: GET all todos, GET by id, POST create, PUT update, DELETE
     - Uses dependency injection to access `ITodoService`
@@ -38,48 +39,48 @@ The application uses a layered architecture:
   - Includes comprehensive ProducesResponseType attributes for OpenAPI documentation
 
 #### Services
-- **[TodoService](backend/src/Todo.Api/Services/TodoService.cs)** 
+- **[TodoService](backend/Todo.Api/Services/TodoService.cs)** 
   - Implements business logic for todo operations
   - Handles validation and error handling (throws `KeyNotFoundException` for missing items)
   - Maps between domain models and request/response contracts
   - Uses `ITodoRepository` for data access
 
 #### Persistence Layer
-- **[TodoDbContext](backend/src/Todo.Api/Persistence/TodoDbContext.cs)**
+- **[TodoDbContext](backend/Todo.Api/Persistence/TodoDbContext.cs)**
   - Entity Framework Core DbContext managing the `TodoItems` DbSet
   - Configured to use in-memory database for development
   - Includes SQLite configuration option (commented out)
   - Applies entity configurations via fluent API
 
-- **[TodoRepository](backend/src/Todo.Api/Persistence/TodoRepository.cs)**
+- **[TodoRepository](backend/Todo.Api/Persistence/TodoRepository.cs)**
   - Implements repository pattern via `ITodoRepository` interface
   - Provides data access methods: GetAll, GetById, Add, Update, Delete
   - Returns todos ordered by creation date
   - Handles all database operations asynchronously
 
-- **[TodoItemConfiguration](backend/src/Todo.Api/Persistence/TodoConfiguration.cs)**
+- **[TodoItemConfiguration](backend/Todo.Api/Persistence/TodoItemConfiguration.cs)**
   - Entity Framework configuration for `TodoItem` entity
   - Defines table name, primary key, and property constraints
   - Sets `Title` as required with 240 character max length
 
 #### Models
-- **[Domain Models](backend/src/Todo.Api/Models/Domain/)**
-  - **[TodoItem](backend/src/Todo.Api/Models/Domain/TodoItem.cs)** - Core domain entity with Id, Title, IsCompleted, CreatedDate, and CompletedDate properties
+- **[Domain Models](backend/Todo.Api/Models/Domain/)**
+  - **[TodoItem](backend/Todo.Api/Models/Domain/TodoItem.cs)** - Core domain entity with Id, Title, IsCompleted, CreatedDate, and CompletedDate properties
   - Implemented as a record type for immutability
 
-- **[Contract Models](backend/src/Todo.Api/Models/Contracts/)**
-  - **[CreateTodoRequest](backend/src/Todo.Api/Models/Contracts/CreateTodoRequest.cs)** - DTO for creating new todos
-  - **[UpdateTodoRequest](backend/src/Todo.Api/Models/Contracts/UpdateTodoRequest.cs)** - DTO for updating existing todos
+- **[Contract Models](backend/Todo.Api/Models/Contracts/)**
+  - **[CreateTodoRequest](backend/Todo.Api/Models/Contracts/CreateTodoRequest.cs)** - DTO for creating new todos
+  - **[UpdateTodoRequest](backend/Todo.Api/Models/Contracts/UpdateTodoRequest.cs)** - DTO for updating existing todos
   - Implemented as record types for data transfer
 #### Middleware
-- **[ExceptionHandler](backend/src/Todo.Api/Common/ExceptionHandler.cs)**
+- **[ExceptionHandler](backend/Todo.Api/Common/ExceptionHandler.cs)**
     - Global exception handling middleware
     - Maps exceptions to appropriate HTTP status codes
     - Returns RFC 7807 Problem Details format for errors
     - Handles `KeyNotFoundException` (404), `ArgumentException` (400), and general exceptions (500)
 
 ### Configuration
-- **[Program.cs](backend/src/Todo.Api/Program.cs)** - Application startup and configuration
+- **[Program.cs](backend/Todo.Api/Program.cs)** - Application startup and configuration
   - Configures dependency injection (scoped services for repository and service layers)
   - Registers Entity Framework with in-memory database
   - Enables OpenAPI/Swagger for API documentation in development
@@ -94,6 +95,8 @@ The application uses a layered architecture:
 
 ## Frontend
 The frontend is a modern Vue 3 application built with TypeScript and styled using Tailwind CSS with daisyUI components. It provides an intuitive interface for managing todo items with real-time updates and responsive design.
+
+More on `vue` setup, see [Vue.js README](frontend/todo-app/README.md)
 
 ### Architecture Overview
 

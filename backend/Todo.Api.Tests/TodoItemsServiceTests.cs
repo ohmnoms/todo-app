@@ -58,18 +58,24 @@ public class TodoItemsServiceTests
     {
         // Arrange
         var todoId = Guid.NewGuid();
+        var createdBy = Guid.NewGuid();
         var todoItem = new TodoItem
         {
             Id = todoId,
             Title = "Existing todo",
-            IsCompleted = false
+            IsCompleted = false,
+            CreatedBy = createdBy,
+        };
+        var createdByRequest = new GetTodoRequest
+        {
+            CreatedBy = createdBy
         };
 
-        repoMock.Setup(r => r.GetByIdAsync(todoId, It.IsAny<CancellationToken>()))
+        repoMock.Setup(r => r.GetByIdAsync(todoId, createdByRequest, It.IsAny<CancellationToken>()))
             .ReturnsAsync(todoItem);
 
         // Act
-        var result = await _sut.GetByIdAsync(todoId);
+        var result = await _sut.GetByIdAsync(todoId, createdByRequest);
 
         // Assert
         Assert.Equal(todoItem, result);
@@ -80,10 +86,14 @@ public class TodoItemsServiceTests
     {
         // Arrange
         var nonExistentId = Guid.NewGuid();
-        repoMock.Setup(r => r.GetByIdAsync(nonExistentId, It.IsAny<CancellationToken>()))
+        var createdByRequest = new GetTodoRequest
+        {
+            CreatedBy = Guid.NewGuid()
+        };
+        repoMock.Setup(r => r.GetByIdAsync(nonExistentId, createdByRequest, It.IsAny<CancellationToken>()))
             .ReturnsAsync((TodoItem?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _sut.GetByIdAsync(nonExistentId));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _sut.GetByIdAsync(nonExistentId, createdByRequest));
     }
 }

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import ToasterMessage from './components/ToasterMessage.vue';
-import TodoPage from './views/TodoPage.vue';
+import ToasterMessage from '@/components/ToasterMessage.vue';
+import { useTheme } from './composables/useTheme';
+
+useTheme();
 </script>
 
 <template>
   <div class="app-shell">
-    <TodoPage />
+    <RouterView />
   </div>
   <ToasterMessage />
 </template>

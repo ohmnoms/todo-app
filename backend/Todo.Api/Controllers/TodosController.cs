@@ -18,15 +18,17 @@ public class TodosController(ITodoItemsService todoService) : ControllerBase
     /// <summary>
     /// Gets all Todo items.
     /// </summary>
+    /// <param name="request">Query filters for the Todo items</param>
     /// <returns>A list of todos</returns>
     /// <response code="200">Returns the list of Todo items</response>
     /// <response code="500">If there is an internal server error</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<TodoItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetTodos()
+    public async Task<IActionResult> GetTodos([FromQuery] GetTodoRequest? request)
     {
-        var todos = await _todoService.GetAllAsync();
+        var todos = await _todoService.GetAllAsync(request);
         var todoDTOs = todos.Select(t => t.ToDTO()).ToList();
         return Ok(todoDTOs);
     }
@@ -35,17 +37,19 @@ public class TodosController(ITodoItemsService todoService) : ControllerBase
     /// Gets a Todo item by its ID.
     /// </summary>
     /// <param name="id">The ID of the Todo item.</param>
+    /// <param name="request">Query filters for the Todo item</param>
     /// <returns>The requested Todo item.</returns>
     /// <response code="200">Returns the requested Todo item</response>
     /// <response code="404">If the Todo item is not found</response>
     /// <response code="500">If there is an internal server error</response>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(TodoItem), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetTodoById(Guid id)
+    public async Task<IActionResult> GetTodoById(Guid id, [FromQuery] GetTodoRequest? request)
     {
-        var todo = await _todoService.GetByIdAsync(id);
+        var todo = await _todoService.GetByIdAsync(id, request);
         return Ok(todo.ToDTO());
     }
 

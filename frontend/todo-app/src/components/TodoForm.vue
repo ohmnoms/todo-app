@@ -5,6 +5,7 @@ import type { CreateTodoRequest } from '@/models/create-todo-request';
 import type { TodoItem } from '@/models/todo-item';
 import type { UpdateTodoRequest } from '@/models/update-todo-request';
 import { computed, reactive, ref, watch } from 'vue';
+import { useDeviceId } from '@/composables/useDeviceId';
 
 const props = defineProps<{
   busy?: boolean;
@@ -23,6 +24,7 @@ const dueTime = ref<string | null>(props.todo?.dueTime ?? null);
 const completedDate = ref<string | null>(
   toDateTimeLocal(props.todo?.completedDate ?? null)
 );
+const deviceId = useDeviceId();
 
 const touched = reactive({
   title: false,
@@ -157,6 +159,7 @@ function onSubmit() {
       dueTime: dueTime.value || null,
       isCompleted: props.todo!.isCompleted,
       completedDate: fromDateTimeLocal(completedDate.value),
+      createdBy: deviceId,
     };
     emit('update', payload);
     return;
@@ -168,6 +171,7 @@ function onSubmit() {
     dueDate: dueDate.value || null,
     dueTime: dueTime.value || null,
     completedDate: fromDateTimeLocal(completedDate.value),
+    createdBy: deviceId,
   };
   emit('submit', payload);
   resetForm();

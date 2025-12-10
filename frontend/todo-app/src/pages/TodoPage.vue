@@ -14,6 +14,9 @@ const isLoading = computed(() => todosQuery.isPending.value);
 </script>
 
 <template>
+  <router-link to="/settings" class="btn btn-ghost btn-circle">
+    <span class="material-icons">settings</span>
+  </router-link>
   <div class="justify-center text-center">
     <h1 class="text-2xl font-bold mb-4">Simple To Do</h1>
     <h3 class="text-lg mb-6 text-gray-600">Keep it simple</h3>
@@ -34,6 +37,7 @@ const isLoading = computed(() => todosQuery.isPending.value);
         if (todo) {
           updateTodo.mutate({ id: todo.id, patch: { 
             ...todo, 
+            createdBy: todo.createdBy,
             isCompleted: !todo.isCompleted,
             completedDate: !todo.isCompleted 
               ? new Date().toISOString() : null
